@@ -1,0 +1,207 @@
+#Clean All
+MATCH (n:Airport) DETACH DELETE n
+
+#init
+USING PERIODIC COMMIT
+
+# import airport
+LOAD CSV WITH HEADERS FROM 'file:///airports.csv' AS line
+CREATE (:Airport{code: line.Code})
+
+CREATE INDEX ON :Airport(code);
+CREATE CONSTRAINT ON (o:airport) ASSERT o.code IS UNIQUE;
+
+# import airports relationship
+LOAD CSV WITH HEADERS FROM 'file:///flights.csv' AS line
+MATCH (a:Airport), (b:Airport) 
+   WHERE a.Code = line.DepartureCity AND b.Code = line.ArrivalCity
+   MERGE (a)-[r:FLIES_TO]->(b) 
+RETURN r 
+
+#import fight- airport relation
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (arrival:Airport {code: row.ArrivalCity})
+MATCH (departure:Airport {code: row.DepartureCity})
+CREATE (arrival)-[ft:FLIES_TO{distance:toFloat(row.FlightDistance)}]->(departure)
+RETURN arrival, departure ;
+
+#Create days
+CREATE (:AirportDay{code: "Monday"});
+CREATE (:AirportDay{code: "Tuesday"});
+CREATE (:AirportDay{code: "Wednesday"});
+CREATE (:AirportDay{code: "Thursday"});
+CREATE (:AirportDay{code: "Friday"});
+CREATE (:AirportDay{code: "Saturday"});
+CREATE (:AirportDay{code: "Sunday"});
+
+#Clean has day
+MATCH ()-[r:HAS_DAY]->() DELETE r;
+
+#load monday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (day:AirportDay {code: "Monday"})
+WHERE toInteger(row.DayOfOperationMonday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Monday"})
+WHERE toInteger(row.DayOfOperationMonday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#load Tuesday 
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (day:AirportDay {code: "Tuesday"})
+WHERE toInteger(row.DayOfOperationTuesday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Tuesday"})
+WHERE toInteger(row.DayOfOperationTuesday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#load Wednesday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Wednesday"})
+WHERE toInteger(row.DayOfOperationWednesday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Wednesday"})
+WHERE toInteger(row.DayOfOperationWednesday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#load Thursday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Thursday"})
+WHERE toInteger(row.DayOfOperationThursday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Thursday"})
+WHERE toInteger(row.DayOfOperationThursday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#load Friday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Friday"})
+WHERE toInteger(row.DayOfOperationFriday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Friday"})
+WHERE toInteger(row.DayOfOperationFriday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#Load Friday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Friday"})
+WHERE toInteger(row.DayOfOperationFriday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Friday"})
+WHERE toInteger(row.DayOfOperationFriday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#Load Saturday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Saturday"})
+WHERE toInteger(row.DayOfOperationSaturday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Saturday"})
+WHERE toInteger(row.DayOfOperationSaturday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+#Load Saturday
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.ArrivalCity})
+MATCH (dd:AirportDay {code: "Sunday"})
+WHERE toInteger(row.DayOfOperationSunday) >0
+CREATE (airport)-[hd:HAS_DAY]->(dd)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
+LOAD CSV WITH HEADERS FROM "file:///flights.csv" AS row
+MATCH (airport:Airport {code: row.DepartureCity})
+MATCH (day:AirportDay {code: "Sunday"})
+WHERE toInteger(row.DayOfOperationSunday) >0
+CREATE (airport)-[hd:HAS_DAY]->(day)
+CREATE (fl:Flight{code: row.AirlineCode, daparts: row.DepartureCity, arrives: row.ArrivalCity,  distance: row.FlightDistance })
+CREATE (day)-[:ORD_FLIGHT]->(fl)
+CREATE (fl)-[:ORD_FLIGHT]->(day)
+RETURN airport;
+
